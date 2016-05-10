@@ -93,15 +93,15 @@ sock_array :
 ```
 
 ## Method Of Sock
+
 ### sock:close()
+
 ### sock:bind(addr)
+see [addr](#addr)
+
 #### args:
 ```
-addr :
-	inproc://test
-	ipc:///tmp/test.ipc
-	ipc://127.0.0.1:7788
-	tcp://127.0.0.1:5560
+addr : string
 ```
 #### return:
 ```
@@ -109,13 +109,10 @@ eid : to shutdown
 ```
 
 ### sock:connect(addr)
+see [addr](#addr)
 #### args:
 ```
-addr :
-	inproc://test
-	ipc:///tmp/test.ipc
-	ipc://127.0.0.1:7788
-	tcp://127.0.0.1:5560
+addr : string
 ```
 #### return:
 ```
@@ -184,6 +181,18 @@ see [NN_NS_SOCKET_OPTION](#nn_ns_socket_option)
 
 see [NN_NS_TRANSPORT_OPTION](#nn_ns_transport_option)
 
+## Examples:
+
+### addr
+
+example:
+
+```
+    inproc://test
+    ipc:///tmp/test.ipc
+    ipc://127.0.0.1:7788
+    tcp://127.0.0.1:5560
+```
 
 ## Macros
 
