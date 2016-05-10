@@ -192,7 +192,7 @@ see [NN_NS_TRANSPORT_OPTION](#NN_NS_TRANSPORT_OPTION)
 name, value, type, unittype
 ```
 
-### NN_NS_NAMESPACE 0
+### NN_NS_NAMESPACE
 ```
 NN_NS_VERSION   1       0       0
 NN_NS_DOMAIN    2       0       0
@@ -209,27 +209,27 @@ NN_NS_LIMIT     12      0       0
 NN_NS_EVENT     13      0       0
 ```
 
-### NN_NS_VERSION 1
+### NN_NS_VERSION
 ```
 NN_VERSION_CURRENT      4       0       0
 NN_VERSION_REVISION     0       0       0
 NN_VERSION_AGE  0       0       0
 ```
 
-### NN_NS_DOMAIN 2
+### NN_NS_DOMAIN
 ```
 AF_SP   1       0       0
 AF_SP_RAW       2       0       0
 ```
 
-### NN_NS_TRANSPORT 3
+### NN_NS_TRANSPORT
 ```
 NN_INPROC       -1      0       0
 NN_IPC  -2      0       0
 NN_TCP  -3      0       0
 ```
 
-### NN_NS_PROTOCOL 4
+### NN_NS_PROTOCOL
 ```
 NN_PAIR 16      0       0
 NN_PUB  32      0       0
@@ -243,13 +243,13 @@ NN_RESPONDENT   99      0       0
 NN_BUS  112     0       0
 ```
 
-### NN_NS_OPTION_LEVEL 5
+### NN_NS_OPTION_LEVEL
 ```
 NN_SOL_SOCKET   0       0       0
 ```
 
 
-### NN_NS_SOCKET_OPTION 6
+### NN_NS_SOCKET_OPTION
 ```
 NN_LINGER       1       1       2
 NN_SNDBUF       2       1       1
@@ -269,7 +269,7 @@ NN_SOCKET_NAME  15      2       0
 NN_RCVMAXSIZE   16      1       1
 ```
 
-### NN_NS_TRANSPORT_OPTION 7
+### NN_NS_TRANSPORT_OPTION
 ```
 NN_SUB_SUBSCRIBE        1       2       0
 NN_SUB_UNSUBSCRIBE      2       2       0
@@ -278,14 +278,14 @@ NN_SURVEYOR_DEADLINE    1       1       2
 NN_TCP_NODELAY  1       1       4
 ```
 
-### NN_NS_OPTION_TYPE 8
+### NN_NS_OPTION_TYPE
 ```
 NN_TYPE_NONE    0       0       0
 NN_TYPE_INT     1       0       0
 NN_TYPE_STR     2       0       0
 ```
 
-### NN_NS_OPTION_UNIT 9
+### NN_NS_OPTION_UNIT
 NN_UNIT_NONE    0       0       0
 NN_UNIT_BYTES   1       0       0
 NN_UNIT_MILLISECONDS    2       0       0
@@ -293,12 +293,12 @@ NN_UNIT_PRIORITY        3       0       0
 NN_UNIT_BOOLEAN 4       0       0
 ```
 
-### NN_NS_FLAG 10
+### NN_NS_FLAG
 ```
 NN_DONTWAIT     1       0       0
 ```
 
-### NN_NS_ERROR 11
+### NN_NS_ERROR
 ```
 EINTR   4       0       0
 EBADF   9       0       0
@@ -334,12 +334,12 @@ ETERM   156384765       0       0
 EFSM    156384766       0       0
 ```
 
-### NN_NS_LIMIT 12
+### NN_NS_LIMIT
 ```
 NN_SOCKADDR_MAX 128     0       0
 ```
 
-### NN_NS_EVENT 13
+### NN_NS_EVENT
 ```
 NN_POLLIN       1       0       0
 NN_POLLOUT      2       0       0
