@@ -286,6 +286,7 @@ NN_TYPE_STR     2       0       0
 ```
 
 ### NN_NS_OPTION_UNIT
+```
 NN_UNIT_NONE    0       0       0
 NN_UNIT_BYTES   1       0       0
 NN_UNIT_MILLISECONDS    2       0       0
