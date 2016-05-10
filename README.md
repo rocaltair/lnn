@@ -12,9 +12,9 @@ Implemented in C, it works on a wide range of operating systems with no further 
 
 ### socket(domain, protocol)
 
-see  [NN_DOMAIN](#NN_DOMAIN)
+see  [NN_DOMAIN](#nn_domain)
 
-see  [NN_PROTOCOL](#NN_PROTOCOL)
+see  [NN_PROTOCOL](#nn_protocol)
 
 #### args:
 ```
@@ -48,7 +48,7 @@ Returns value of errno for the current thread.
 
 ### strerror(errnum)
 
-see [NN_NS_ERROR](#NN_NS_ERROR)
+see [NN_NS_ERROR](#nn_ns_error)
 
 #### args:
 ```
@@ -133,7 +133,7 @@ how :
 
 ### sock:send(buf, flags)
 
-see [NN_NS_FLAG](#NN_NS_FLAG)
+see [NN_NS_FLAG](#nn_ns_flag)
 #### args:
 ```
 buf : 
@@ -151,7 +151,7 @@ errstr:
 
 ### sock:recv(len, flag)
 
-see [NN_NS_FLAG](#NN_NS_FLAG)
+see [NN_NS_FLAG](#nn_ns_flag)
 #### args:
 ```
 len :
@@ -170,19 +170,19 @@ errstr:
 
 ### sock:setsockopt(level, option)
 
-see [NN_NS_OPTION_LEVEL](#NN_NS_OPTION_LEVEL)
+see [NN_NS_OPTION_LEVEL](#nn_ns_option_level)
 
-see [NN_NS_SOCKET_OPTION](#NN_NS_SOCKET_OPTION)
+see [NN_NS_SOCKET_OPTION](#nn_ns_socket_option)
 
-see [NN_NS_TRANSPORT_OPTION](#NN_NS_TRANSPORT_OPTION)
+see [NN_NS_TRANSPORT_OPTION](#nn_ns_transport_option)
 
 ### sock:getsockopt(level, option, value)
 
-see [NN_NS_OPTION_LEVEL](#NN_NS_OPTION_LEVEL)
+see [NN_NS_OPTION_LEVEL](#nn_ns_option_level)
 
-see [NN_NS_SOCKET_OPTION](#NN_NS_SOCKET_OPTION)
+see [NN_NS_SOCKET_OPTION](#nn_ns_socket_option)
 
-see [NN_NS_TRANSPORT_OPTION](#NN_NS_TRANSPORT_OPTION)
+see [NN_NS_TRANSPORT_OPTION](#nn_ns_transport_option)
 
 
 ## Macros
