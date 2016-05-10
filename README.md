@@ -12,9 +12,9 @@ Implemented in C, it works on a wide range of operating systems with no further 
 
 ### socket(domain, protocol)
 
-see  [NN_DOMAIN](#nn_domain)
+see  [NN_NS_DOMAIN](#nn_ns_domain)
 
-see  [NN_PROTOCOL](#nn_protocol)
+see  [NN_NS_PROTOCOL](#nn_ns_protocol)
 
 #### args:
 ```
