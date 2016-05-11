@@ -214,18 +214,20 @@ static int lua__nn_getsockopt(lua_State *L)
 	case NN_SUB_UNSUBSCRIBE:
 		optvallen = sizeof(str_optval);
 		rc = nn_getsockopt(*s, level, option, str_optval, &optvallen);
-		if (!rc)
+		if (!rc) {
 			lua_pushlstring(L, str_optval, optvallen);
-		else
+		} else {
 			lua_pushnil(L);
+		}
 		break;
 	default:
 		optvallen = sizeof(int);
 		rc = nn_getsockopt(*s, level, option, &int_optval, &optvallen);
-		if (!rc)
+		if (!rc) {
 			lua_pushinteger(L, int_optval);
-		else
+		} else {
 			lua_pushnil(L);
+		}
 	}
 	return 1;
 }
@@ -318,8 +320,8 @@ static int lua__nn_recv(lua_State *L)
 	size_t len;
 	int flags;
 	int nbytes;
-	void *buf;
 	int nret;
+	void *buf = NULL;
 	int top = lua_gettop(L); 
 
 	s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
@@ -329,7 +331,10 @@ static int lua__nn_recv(lua_State *L)
 	if (len != NN_MSG) {
 		buf = malloc(len + 1);
 		if (buf == NULL) {
-			return luaL_error(L, "memory error");
+			lua_pushnil(L);
+			lua_pushinteger(L, ENOMEM);
+			lua_pushstring(L, "memory not enough");
+			return 3;
 		}
 		nbytes = nn_recv(s, buf, len, flags);
 	} else {
@@ -351,7 +356,10 @@ static int lua__nn_recv(lua_State *L)
 	if (len != NN_MSG) {
 		free(buf);
 	} else {
-		nn_freemsg(buf);
+		DLOG("buf=%p,buf_addr=%p,\n", buf, &buf);
+		if (buf != NULL) {
+			nn_freemsg(buf);
+		}
 	}
 	return nret;
 }
