@@ -1,6 +1,6 @@
 ## Description
 
-[nanomsg](http://nanomsg.org/) - scalability protocols library
+[nanomsg](https://github.com/nanomsg/nanomsg) - scalability protocols library
 nanomsg is a socket library that provides several common communication patterns.
 It aims to make the networking layer fast, scalable, and easy to use.
 Implemented in C, it works on a wide range of operating systems with no further dependencies.
