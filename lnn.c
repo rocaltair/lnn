@@ -33,12 +33,12 @@ static int lua__nn_sleep(lua_State *L)
 {
 	int milliseconds = (int)luaL_optinteger(L, 1, 0); 
 #if (defined(WIN32) || defined(_WIN32))
-	Sleep (milliseconds);
+	Sleep(milliseconds);
 #else
 	struct timespec ts; 
 	ts.tv_sec = milliseconds / 1000;
 	ts.tv_nsec = milliseconds % 1000 * 1000000;
-	nanosleep (&ts, NULL);
+	nanosleep(&ts, NULL);
 #endif /* endif for defined windows */
 	return 0;
 }
@@ -85,8 +85,10 @@ static int lua__nn_device(lua_State *L)
 	rc = nn_device(*s1, *s2);
 	lua_pushboolean(L, rc == 0);
 	if (rc != 0) {
-		lua_pushstring(L, nn_strerror(nn_errno()));
-		return 2;
+		int errnum = nn_errno();
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
 	}
 	return 1;
 }
@@ -99,7 +101,7 @@ static int lua__nn_symbol_info(lua_State *L)
 	int ret;
 	struct nn_symbol_properties sym;
 	int i = (int)luaL_checkinteger(L, 1);
-	ret = nn_symbol_info (i, &sym, sizeof(sym));
+	ret = nn_symbol_info(i, &sym, sizeof(sym));
 	if (ret == 0) {
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, "#1 error");
@@ -142,9 +144,11 @@ static int lua__nn_socket(lua_State *L)
 	int protocol = (int)luaL_checkinteger(L, 2);
 	ret = nn_socket(domain, protocol);
 	if (ret < 0) {
+		int errnum = nn_errno();
 		lua_pushboolean(L, 0);
-		lua_pushstring(L, nn_strerror(nn_errno()));
-		return 2;
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
 	}
 	s = (int *)lua_newuserdata(L, sizeof(int));
 	*s = ret;
@@ -170,9 +174,11 @@ static int lua__nn_close(lua_State *L)
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	ret = nn_close(s);
 	if (ret < 0) {
+		int errnum = nn_errno();
 		lua_pushboolean(L, 0);
-		lua_pushstring(L, nn_strerror(nn_errno()));
-		return 2;
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
 	}
 	lua_pushboolean(L, 1);
 	return 1;
@@ -203,7 +209,14 @@ static int lua__nn_setsockopt(lua_State *L)
 		int_optval = luaL_checkinteger(L, 4);
 		rc = nn_setsockopt(*s, level, option, &int_optval, sizeof(int));
 	}
-	lua_pushboolean(L, rc == 0);
+	if (rc != 0) {
+		int errnum = nn_errno();
+		lua_pushboolean(L, 0);
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
+	}
+	lua_pushboolean(L, 1);
 	return 1;
 }
 
@@ -254,9 +267,11 @@ static int lua__nn_bind(lua_State *L)
 	const char * addr = (const char *)luaL_checkstring(L, 2);
 	ret = nn_bind(s, addr);
 	if (ret == -1) {
+		int errnum = nn_errno();
 		lua_pushnil(L);
-		lua_pushstring(L, nn_strerror(nn_errno()));
-		return 2;
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
 	}
 	lua_pushinteger(L, ret);
 	return 1;
@@ -272,9 +287,11 @@ static int lua__nn_connect(lua_State *L)
 	const char * addr = (const char *)luaL_checkstring(L, 2);
 	ret = nn_connect(s, addr);
 	if (ret < 0) {
+		int errnum = nn_errno();
 		lua_pushnil(L);
-		lua_pushstring(L, nn_strerror(nn_errno()));
-		return 2;
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
 	}
 	lua_pushinteger(L, ret);
 	return 1;
@@ -290,9 +307,11 @@ static int lua__nn_shutdown(lua_State *L)
 	int how = (int)luaL_checkinteger(L, 2);
 	ret = nn_shutdown(s, how);
 	if (ret < 0) {
+		int errnum = nn_errno();
 		lua_pushboolean(L, 0);
-		lua_pushstring(L, nn_strerror(nn_errno()));
-		return 2;
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+		return 3;
 	}
 	lua_pushboolean(L, ret == 0);
 	return 1;
@@ -313,10 +332,10 @@ static int lua__nn_send(lua_State *L)
 	}
 	ret = nn_send(s, buf, sz, flags);
 	if (ret < 0) {
-		int err = nn_errno();
+		int errnum = nn_errno();
 		lua_pushnil(L);
-		lua_pushinteger(L, err);
-		lua_pushstring(L, nn_strerror(err));
+		lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
 		return 3;
 	}
 	lua_pushinteger(L, ret);
@@ -344,8 +363,8 @@ static int lua__nn_recv(lua_State *L)
 		buf = malloc(len + 1);
 		if (buf == NULL) {
 			lua_pushnil(L);
-			lua_pushinteger(L, ENOMEM);
 			lua_pushstring(L, "memory not enough");
+			lua_pushinteger(L, ENOMEM);
 			return 3;
 		}
 		nbytes = nn_recv(s, buf, len, flags);
@@ -429,14 +448,16 @@ static int lua__nn_poll(lua_State *L)
         rc = nn_poll(pfd, count, timeout);
         if (rc == 0){
                 DLOG("count=%d,timeout=%d\n", count, timeout);
-                DLOG("here:%s\n", nn_strerror(errno));
 		lua_pushnil(L);
 		lua_pushstring(L, "EAGAIN");
-                return 2;
+		lua_pushinteger(L, EAGAIN);
+                return 3;
         }else if (rc < 0){
+		int errnum = nn_errno();
                 lua_pushnil(L);
-                lua_pushfstring(L, "error:%s", nn_strerror(errno));
-                return 2;
+                lua_pushstring(L, nn_strerror(errnum));
+		lua_pushinteger(L, errnum);
+                return 3;
         }
 
         lua_newtable(L);
@@ -483,8 +504,8 @@ static int sock_class(lua_State *L)
 	luaL_register(L, NULL, lmethods);
 	lua_setfield(L, -2, "__index");
 
-	lua_pushcfunction (L, lua__nnsocket_gc);
-	lua_setfield (L, -2, "__gc");
+	lua_pushcfunction(L, lua__nnsocket_gc);
+	lua_setfield(L, -2, "__gc");
 	return 1;
 }
 
@@ -493,7 +514,7 @@ static int luac__nn_symbol(lua_State *L)
 	int value, i;
 	assert(lua_istable(L, -1));
 	for (i = 0; ; ++i) {
-		const char* name = nn_symbol (i, &value);
+		const char* name = nn_symbol(i, &value);
 		if (name == NULL) break;
 		lua_pushnumber(L, value);
 		lua_setfield(L, -2, name);

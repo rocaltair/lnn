@@ -6,13 +6,9 @@ local s = lnn.socket(lnn.AF_SP, lnn.NN_REQ)
 local eid = assert(s:connect(addr))
 print("eid", eid)
 
-function block()
-	local len, errnum, err = s:send("ping")
-	print("send", len, errnum, err)
+local len, err, errnum = s:send("ping")
+print("send", len, err, errnum)
 
-	local data, errnum, err = s:recv()
-	print("recv", data)
-end
-
-block()
+local data, err, errnum = s:recv()
+print("recv", data, errnum)
 

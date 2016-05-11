@@ -142,8 +142,8 @@ flags:
 #### return:
 ```
 number: size of data which has been sent
-errnum:
 errstr:
+errnum:
 ```
 
 ### sock:recv(len, flag)
@@ -161,8 +161,8 @@ flags:
 #### return:
 ```
 data: recv data
-errnum:
 errstr:
+errnum:
 ```
 
 ### sock:setsockopt(level, option)

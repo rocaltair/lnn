@@ -19,8 +19,8 @@ while true do
 	local pl, err = lnn.poll(list, 50)
 	if pl and #pl > 0 then
 		for _, row in pairs(pl) do
-			local data, errno, err = row.sock:recv()
-			print(data, errno, err)
+			local data, err, errnum = row.sock:recv()
+			print(data, err, errnum)
 			row.sock:send("pong")
 		end
 	end 
