@@ -6,6 +6,12 @@
 #include <string.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/pubsub.h>
+#if (defined(WIN32) || defined(_WIN32))
+# include <windows.h>
+#else
+# include <unistd.h>
+# include <time.h>
+#endif /* endif for defined windows */
 
 #if (LUA_VERSION_NUM < 502 && !defined(luaL_newlib))
 #  define luaL_newlib(L,l) (lua_newtable(L), luaL_register(L,NULL,l))
@@ -22,12 +28,18 @@
 # define DLOG(fmt, ...) do {} while(0)
 #endif
 
-void nn_sleep(int milliseconds);
 
 static int lua__nn_sleep(lua_State *L) 
 {
-	int ms = (int)luaL_optinteger(L, 1, 0); 
-	nn_sleep(ms);
+	int milliseconds = (int)luaL_optinteger(L, 1, 0); 
+#if (defined(WIN32) || defined(_WIN32))
+	Sleep (milliseconds);
+#else
+	struct timespec ts; 
+	ts.tv_sec = milliseconds / 1000;
+	ts.tv_nsec = milliseconds % 1000 * 1000000;
+	nanosleep (&ts, NULL);
+#endif /* endif for defined windows */
 	return 0;
 }
 
