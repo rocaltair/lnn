@@ -10,7 +10,7 @@ function block()
 	local len, errnum, err = s:send("ping")
 	print("send", len, errnum, err)
 
-	local data, errnum, err = s:recv(200)
+	local data, errnum, err = s:recv()
 	print("recv", data)
 end
 

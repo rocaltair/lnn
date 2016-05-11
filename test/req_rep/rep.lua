@@ -7,7 +7,7 @@ local eid = s:bind(addr)
 
 function block()
 	while true do
-		local data = s:recv(200)
+		local data = s:recv()
 		if data then
 			s:send("pong")
 			print("rev", data)
