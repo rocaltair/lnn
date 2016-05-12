@@ -19,7 +19,7 @@ function node0(url)
 	local s = assert(lnn.socket(lnn.AF_SP, lnn.NN_PULL))
 	assert(s:bind(url))
 	while true do
-		local data = assert(s:recv())
+		local buf = assert(s:recv())
 		print("NODE0:RECEIVED", buf)
 	end
 	return true
