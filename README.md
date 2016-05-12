@@ -14,6 +14,11 @@ I wrote some examples under example dir like
 
 Here is the c source code [nanomsg-examples](https://github.com/dysinger/nanomsg-examples).
 
+run :
+```
+sh run_example.sh <survey|bus|pubsub|reqrep|pair|pipeline>
+```
+
 ### How to use poll model
 
 ```
@@ -209,8 +214,6 @@ see [NN_NS_OPTION_LEVEL](#nn_ns_option_level)
 see [NN_NS_SOCKET_OPTION](#nn_ns_socket_option)
 
 see [NN_NS_TRANSPORT_OPTION](#nn_ns_transport_option)
-
-## Examples:
 
 ### addr
 

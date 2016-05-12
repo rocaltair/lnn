@@ -12,6 +12,7 @@ CFLAGS = -c -O3 -Wall -fPIC -Werror=declaration-after-statement -std=c99 -pedant
 LDFLAGS = -O3 -Wall --shared
 
 ifeq ($(PLATFORM),Linux)
+	LLIBS += -Wl,-rpath=/usr/local/lib/
 else
 	ifeq ($(PLATFORM), Darwin)
 		LLIBS += -llua
