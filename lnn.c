@@ -10,8 +10,8 @@
 # include <windows.h>
 #else
 # include <unistd.h>
-# include <time.h>
 # include <sys/time.h>
+# include <time.h>
 #endif /* endif for defined windows */
 
 #if (LUA_VERSION_NUM < 502 && !defined(luaL_newlib))
