@@ -304,7 +304,7 @@ static int lua__nn_shutdown(lua_State *L)
 {
 	int ret;
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
-	int how = (int)luaL_checkinteger(L, 2);
+	int how = (int)luaL_optinteger(L, 2, 0);
 	ret = nn_shutdown(s, how);
 	if (ret < 0) {
 		int errnum = nn_errno();

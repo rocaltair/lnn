@@ -7,6 +7,35 @@ Implemented in C, it works on a wide range of operating systems with no further 
 
 **lnn** - lua-binding for nanomsg
 
+## Examples
+
+I wrote some examples under example dir like 
+[getting-started-with-nanomsg](http://tim.dysinger.net/posts/2013-09-16-getting-started-with-nanomsg.html).
+
+Here is the c source code [nanomsg-examples](https://github.com/dysinger/nanomsg-examples).
+
+### How to use poll model
+
+```
+local lnn = require "lnn"
+local sock = lnn.socket(lnn.AF_SP, lnn.NN_PAIR)
+local eid = sock:bind('tcp://127.0.0.1:15001')
+
+local watch_list = { 
+        {sock, "rw"}
+}
+
+while true do
+	local pl, err = lnn.poll(watch_list, 50)
+	if pl and #pl > 0 then
+		for _, item in pairs(pl) do
+			local data, err, errnum = item.sock:recv()
+			print(data, err, errnum)
+			item.sock:send("pong")
+		end
+	end 
+end
+```
 
 ## Functions 
 
