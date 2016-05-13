@@ -9,7 +9,7 @@ Implemented in C, it works on a wide range of operating systems with no further 
 
 ## Examples
 
-I wrote some examples under example dir like 
+I wrote some examples under [example](example) dir like 
 [getting-started-with-nanomsg](http://tim.dysinger.net/posts/2013-09-16-getting-started-with-nanomsg.html).
 
 Here is the c source code [nanomsg-examples](https://github.com/dysinger/nanomsg-examples).
