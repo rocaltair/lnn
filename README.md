@@ -19,28 +19,17 @@ run :
 sh run_example.sh <survey|bus|pubsub|reqrep|pair|pipeline>
 ```
 
-### How to use poll model
+### How to use poll model?
 
-```
-local lnn = require "lnn"
-local sock = lnn.socket(lnn.AF_SP, lnn.NN_PAIR)
-local eid = sock:bind('tcp://127.0.0.1:15001')
+#### lnn.poll
 
-local watch_list = { 
-        {sock, "rw"}
-}
+see [test/poll/poll.lua](test/poll/poll.lua)
 
-while true do
-	local pl, err = lnn.poll(watch_list, 50)
-	if pl and #pl > 0 then
-		for _, item in pairs(pl) do
-			local data, err, errnum = item.sock:recv()
-			print(data, err, errnum)
-			item.sock:send("pong")
-		end
-	end 
-end
-```
+#### use poll of system
+
+see [test/uv_poll.lua](test/uv_poll.lua),
+which is based on [luv](https://github.com/luvit/luv)
+and [libuv](https://github.com/joyent/libuv)
 
 ## Functions 
 
