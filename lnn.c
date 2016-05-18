@@ -382,7 +382,7 @@ static int lua__nn_recv(lua_State *L)
 {
 	int s;
 	size_t len;
-	int flags;
+	int flags = 0;
 	int nbytes;
 	int nret;
 	void *buf = NULL;
@@ -390,7 +390,9 @@ static int lua__nn_recv(lua_State *L)
 
 	s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	len = top >= 2 ? luaL_checkinteger(L, 2) : NN_MSG;
-	flags = top >= 3 ? lua_tointeger(L, 3) : 0;
+	if (!lua_isnoneornil(L, 3)) {
+		flags = (int)luaL_checkinteger(L, 3);
+	}
 
 	if (len != NN_MSG) {
 		buf = malloc(len + 1);
