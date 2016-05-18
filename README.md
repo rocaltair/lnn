@@ -157,7 +157,8 @@ see [NN_NS_FLAG](#nn_ns_flag)
 #### args:
 ```
 buf : 
-	string to send
+	string or list of strings to send
+	for example: "hello world", {"hello", " world"}
 flags:
 	0, nil or none : block
 	NN_DONTWAIT : nonblock
