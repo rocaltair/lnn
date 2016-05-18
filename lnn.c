@@ -320,18 +320,50 @@ static int lua__nn_shutdown(lua_State *L)
 
 /**
  * int nn_send(int s, const void * buf, size_t len, int flags)
+ * int nn_sendmsg (int s, const struct nn_msghdr *msghdr, int flags);
  */
 static int lua__nn_send(lua_State *L)
 {
 	int ret;
-	size_t sz;
 	int flags = 0;
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
-	const char * buf = luaL_checklstring(L, 2, &sz);
+
 	if (!lua_isnoneornil(L, 3)) {
 		flags = (int)luaL_checkinteger(L, 3);
 	}
-	ret = nn_send(s, buf, sz, flags);
+
+	if (lua_istable(L, 2)) {
+		int i = 0;
+		size_t sz = lua_objlen(L, 2);
+		struct nn_iovec *iov = malloc(sizeof(struct nn_iovec) * sz);
+		struct nn_msghdr hdr;
+		if (iov == NULL) {
+			return luaL_error(L, "ENOMEM");
+		}
+
+		lua_pushnil(L);
+		while (lua_next(L, 2) != 0) {
+			size_t len = 0;
+			const char *data = lua_tolstring(L, -1, &len);
+			iov[i].iov_base = (void *)data;
+			iov[i].iov_len = len;
+			i++;
+			lua_pop(L, 1);
+		}
+		memset(&hdr, 0, sizeof(hdr));
+		hdr.msg_iov = iov;
+		hdr.msg_iovlen = sz;
+
+		ret = nn_sendmsg(s, &hdr, flags);
+		free(iov);
+	} else if (lua_isstring(L, 2)) {
+		size_t sz;
+		const char * buf = luaL_checklstring(L, 2, &sz);
+		ret = nn_send(s, buf, sz, flags);
+	} else {
+		return luaL_argerror(L, 2, "list or string required!");
+	}
+
 	if (ret < 0) {
 		int errnum = nn_errno();
 		lua_pushnil(L);
