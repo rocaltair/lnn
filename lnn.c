@@ -21,9 +21,9 @@
 #define NN_SOCKET_METATABLE "cls{nn_socket}"
 
 /**
- * #define ENABLE_XXX_DEBUG
+ * #define ENABLE_LNN_DEBUG
  */
-#ifdef ENABLE_XXX_DEBUG
+#ifdef ENABLE_LNN_DEBUG
 # define DLOG(fmt, ...) fprintf(stderr, "<lnn>" fmt "\n", ##__VA_ARGS__)
 #else
 # define DLOG(fmt, ...) do {} while(0)
@@ -535,8 +535,7 @@ static int sock_class(lua_State *L)
 		{NULL, NULL},
 	};
 	luaL_newmetatable(L, NN_SOCKET_METATABLE);
-	lua_newtable(L);
-	luaL_register(L, NULL, lmethods);
+	luaL_newlib(L, lmethods);
 	lua_setfield(L, -2, "__index");
 
 	lua_pushcfunction(L, lua__nnsocket_gc);
