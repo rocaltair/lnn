@@ -386,13 +386,10 @@ static int lua__nn_recv(lua_State *L)
 	int nbytes;
 	int nret;
 	void *buf = NULL;
-	int top = lua_gettop(L); 
 
 	s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
-	len = top >= 2 ? luaL_checkinteger(L, 2) : NN_MSG;
-	if (!lua_isnoneornil(L, 3)) {
-		flags = (int)luaL_checkinteger(L, 3);
-	}
+	len = luaL_optinteger(L, 2, NN_MSG);
+	flags = luaL_optinteger(L, 3, 0);
 
 	if (len != NN_MSG) {
 		buf = malloc(len + 1);
@@ -404,7 +401,7 @@ static int lua__nn_recv(lua_State *L)
 		}
 		nbytes = nn_recv(s, buf, len, flags);
 	} else {
-		nbytes = nn_recv(s, &buf, len, flags);
+		nbytes = nn_recv(s, &buf, NN_MSG, flags);
 	}
 
 	if (nbytes < 0) {
@@ -414,7 +411,6 @@ static int lua__nn_recv(lua_State *L)
 		lua_pushstring(L, nn_strerror(err));
 		nret = 3;
 	} else {
-		((char *)buf)[nbytes] = '\0';
 		lua_pushlstring(L, (const char *)buf, nbytes);
 		nret = 1;
 	}
