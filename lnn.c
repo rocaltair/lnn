@@ -83,6 +83,9 @@ static int lua__nn_device(lua_State *L)
 	s1 = luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	s2 = luaL_checkudata(L, 2, NN_SOCKET_METATABLE);
 
+	luaL_argcheck(L, *s1 >= 0, 1, "valid socket fd required!");
+	luaL_argcheck(L, *s2 >= 0, 2, "valid socket fd required!");
+
 	rc = nn_device(*s1, *s2);
 	lua_pushboolean(L, rc == 0);
 	if (rc != 0) {
@@ -160,11 +163,30 @@ static int lua__nn_socket(lua_State *L)
 
 static int lua__nnsocket_gc(lua_State *L)
 {
-	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
-	nn_close(s);
+	int *sp = (int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+	int s = *sp;
+	int ret;
+	int errnum;
+
+	if (s < 0)
+		return 0;
+
+	do {
+		errnum = 0;
+		ret = nn_close(s);
+		if (ret < 0)
+			errnum = nn_errno();
+	} while(errnum == EINTR);
+	*sp = -1;
 	return 0;
 }
 
+static int lua__nn_is_valid(lua_State *L)
+{
+	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+	lua_pushboolean(L, s >= 0);
+	return 1;
+}
 
 /**
  * int nn_close(int s)
@@ -172,15 +194,24 @@ static int lua__nnsocket_gc(lua_State *L)
 static int lua__nn_close(lua_State *L)
 {
 	int ret;
-	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+	int errnum;
+	int *sp = (int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+	int s = *sp;
+
+	if (s < 0)
+		return 0;
+
 	ret = nn_close(s);
 	if (ret < 0) {
-		int errnum = nn_errno();
+		errnum = nn_errno();
+		if (errnum != EINTR)
+			*sp = -1;
 		lua_pushboolean(L, 0);
 		lua_pushstring(L, nn_strerror(errnum));
 		lua_pushinteger(L, errnum);
 		return 3;
 	}
+	*sp = -1;
 	lua_pushboolean(L, 1);
 	return 1;
 }
@@ -191,24 +222,26 @@ static int lua__nn_close(lua_State *L)
  */
 static int lua__nn_setsockopt(lua_State *L)
 {
-	int *s, level, option, rc, int_optval;
+	int *sp, level, option, rc, int_optval;
 	const char *str_optval;
 	size_t optvallen;
 
-	s = luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+	sp = luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	level = luaL_checkinteger(L, 2);
 	option = luaL_checkinteger(L, 3);
+
+	luaL_argcheck(L, *sp >= 0, 1, "valid socket fd required!");
 
 	switch (option) {
 	case NN_SOCKET_NAME:
 	case NN_SUB_SUBSCRIBE:
 	case NN_SUB_UNSUBSCRIBE:
 		str_optval = luaL_checklstring(L, 4, &optvallen);
-		rc = nn_setsockopt(*s, level, option, str_optval, optvallen);
+		rc = nn_setsockopt(*sp, level, option, str_optval, optvallen);
 		break;
 	default:
 		int_optval = luaL_checkinteger(L, 4);
-		rc = nn_setsockopt(*s, level, option, &int_optval, sizeof(int));
+		rc = nn_setsockopt(*sp, level, option, &int_optval, sizeof(int));
 	}
 	if (rc != 0) {
 		int errnum = nn_errno();
@@ -226,20 +259,22 @@ static int lua__nn_setsockopt(lua_State *L)
  */
 static int lua__nn_getsockopt(lua_State *L)
 {
-	int *s, level, option, rc, int_optval;
+	int *sp, level, option, rc, int_optval;
 	char str_optval[256];
 	size_t optvallen;
 
-	s = luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+	sp = luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	level = luaL_checkinteger(L, 2);
 	option = luaL_checkinteger(L, 3);
+
+	luaL_argcheck(L, *sp >= 0, 1, "valid socket fd required!");
 
 	switch (option) {
 	case NN_SOCKET_NAME:
 	case NN_SUB_SUBSCRIBE:
 	case NN_SUB_UNSUBSCRIBE:
 		optvallen = sizeof(str_optval);
-		rc = nn_getsockopt(*s, level, option, str_optval, &optvallen);
+		rc = nn_getsockopt(*sp, level, option, str_optval, &optvallen);
 		if (!rc) {
 			lua_pushlstring(L, str_optval, optvallen);
 		} else {
@@ -248,7 +283,7 @@ static int lua__nn_getsockopt(lua_State *L)
 		break;
 	default:
 		optvallen = sizeof(int);
-		rc = nn_getsockopt(*s, level, option, &int_optval, &optvallen);
+		rc = nn_getsockopt(*sp, level, option, &int_optval, &optvallen);
 		if (!rc) {
 			lua_pushinteger(L, int_optval);
 		} else {
@@ -266,6 +301,9 @@ static int lua__nn_bind(lua_State *L)
 	int ret;
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	const char * addr = (const char *)luaL_checkstring(L, 2);
+
+	luaL_argcheck(L, s >= 0, 1, "valid socket fd required!");
+
 	ret = nn_bind(s, addr);
 	if (ret == -1) {
 		int errnum = nn_errno();
@@ -286,6 +324,9 @@ static int lua__nn_connect(lua_State *L)
 	int ret;
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	const char * addr = (const char *)luaL_checkstring(L, 2);
+
+	luaL_argcheck(L, s >= 0, 1, "valid socket fd required!");
+
 	ret = nn_connect(s, addr);
 	if (ret < 0) {
 		int errnum = nn_errno();
@@ -306,6 +347,9 @@ static int lua__nn_shutdown(lua_State *L)
 	int ret;
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	int how = (int)luaL_optinteger(L, 2, 0);
+
+	luaL_argcheck(L, s >= 0, 1, "valid socket fd required!");
+
 	ret = nn_shutdown(s, how);
 	if (ret < 0) {
 		int errnum = nn_errno();
@@ -327,6 +371,8 @@ static int lua__nn_send(lua_State *L)
 	int ret;
 	int flags = 0;
 	int s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
+
+	luaL_argcheck(L, s >= 0, 1, "valid socket fd required!");
 
 	if (!lua_isnoneornil(L, 3)) {
 		flags = (int)luaL_checkinteger(L, 3);
@@ -390,6 +436,8 @@ static int lua__nn_recv(lua_State *L)
 	s = *(int *)luaL_checkudata(L, 1, NN_SOCKET_METATABLE);
 	len = luaL_optinteger(L, 2, NN_MSG);
 	flags = luaL_optinteger(L, 3, 0);
+
+	luaL_argcheck(L, s >= 0, 1, "valid socket fd required!");
 
 	if (len != NN_MSG) {
 		buf = malloc(len + 1);
@@ -520,6 +568,7 @@ static int lua__nn_poll(lua_State *L)
 static int sock_class(lua_State *L)
 {
 	luaL_Reg lmethods[] = {
+		{"is_valid", lua__nn_is_valid},
 		{"close", lua__nn_close},
 		{"bind", lua__nn_bind},
 		{"connect", lua__nn_connect},
